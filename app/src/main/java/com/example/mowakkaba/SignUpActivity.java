@@ -1,9 +1,10 @@
 package com.example.mowakkaba;
 
 import android.os.Bundle;
-import android.view.View;
+import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,24 +15,33 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_activity);
 
-        // Initialize UI elements
+        EditText firstNameInput = findViewById(R.id.signup_first_name);
+        EditText lastNameInput = findViewById(R.id.signup_last_name);
         EditText emailInput = findViewById(R.id.signup_email);
         EditText passwordInput = findViewById(R.id.signup_password);
-        EditText confirmPasswordInput = findViewById(R.id.signup_confirm_password);
+        EditText verifyPasswordInput = findViewById(R.id.signup_verify_password);
         Button signUpButton = findViewById(R.id.signup_button);
 
-        // Handle sign-up button click
-        signUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = emailInput.getText().toString();
-                String password = passwordInput.getText().toString();
-                String confirmPassword = confirmPasswordInput.getText().toString();
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
 
-                if (password.equals(confirmPassword) && !email.isEmpty()) {
-                    // TODO: Add sign-up logic here (e.g., Firebase or API integration)
-                    finish(); // Go back to login screen
-                }
+        signUpButton.setOnClickListener(v -> {
+            String firstName = firstNameInput.getText().toString().trim();
+            String lastName = lastNameInput.getText().toString().trim();
+            String email = emailInput.getText().toString().trim();
+            String password = passwordInput.getText().toString();
+            String verifyPassword = verifyPasswordInput.getText().toString();
+
+            if (!password.equals(verifyPassword)) {
+                Toast.makeText(SignUpActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            boolean success = dbHelper.insertUser(firstName, lastName, email, password);
+            if (success) {
+                Toast.makeText(SignUpActivity.this, "Sign-Up Successful", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(SignUpActivity.this, "Sign-Up Failed (Email might already exist)", Toast.LENGTH_SHORT).show();
             }
         });
     }
