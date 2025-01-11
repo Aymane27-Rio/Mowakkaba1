@@ -37,6 +37,7 @@
         <activity android:name=".ProfileActivity" />
         <activity android:name=".AppointmentsActivity" />
         <activity android:name=".ResourcesActivity" />
+        <activity android:name=".MatchingActivity" />
 
     </application>
 

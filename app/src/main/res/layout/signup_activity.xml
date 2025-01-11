@@ -8,8 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:gravity="center">
+        android:padding="16dp">
 
         <!-- Sign-Up Title -->
         <TextView
@@ -18,8 +17,8 @@
             android:text="Create an Account"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="24dp"/>
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp" />
 
         <!-- First Name Input -->
         <EditText
@@ -28,7 +27,7 @@
             android:layout_height="wrap_content"
             android:hint="First Name"
             android:inputType="textPersonName"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp" />
 
         <!-- Last Name Input -->
         <EditText
@@ -37,7 +36,7 @@
             android:layout_height="wrap_content"
             android:hint="Last Name"
             android:inputType="textPersonName"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp" />
 
         <!-- Email Input -->
         <EditText
@@ -46,7 +45,7 @@
             android:layout_height="wrap_content"
             android:hint="Email"
             android:inputType="textEmailAddress"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp" />
 
         <!-- Password Input -->
         <EditText
@@ -55,7 +54,7 @@
             android:layout_height="wrap_content"
             android:hint="Password"
             android:inputType="textPassword"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp" />
 
         <!-- Verify Password Input -->
         <EditText
@@ -64,7 +63,30 @@
             android:layout_height="wrap_content"
             android:hint="Verify Password"
             android:inputType="textPassword"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginBottom="16dp" />
+
+        <!-- User Type Dropdown -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Who are you?"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/user_type_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Dynamic Form Placeholder -->
+        <LinearLayout
+            android:id="@+id/dynamic_form_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp" />
 
         <!-- Sign-Up Button -->
         <Button
@@ -73,6 +95,6 @@
             android:layout_height="wrap_content"
             android:text="Sign Up"
             android:backgroundTint="@color/teal_700"
-            android:textColor="@android:color/white"/>
+            android:textColor="@android:color/white" />
     </LinearLayout>
 </ScrollView>
