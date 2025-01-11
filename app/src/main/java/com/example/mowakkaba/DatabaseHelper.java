@@ -4,34 +4,38 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    private static final String TAG = "DatabaseHelper";
     private static final String DATABASE_NAME = "Mowakkaba.db";
+    private static final int DATABASE_VERSION = 1;
+
     private static final String TABLE_USERS = "users";
 
-    // Columns
+    // Column Names
     private static final String COL_ID = "id";
     private static final String COL_FIRST_NAME = "first_name";
     private static final String COL_LAST_NAME = "last_name";
     private static final String COL_EMAIL = "email";
     private static final String COL_PASSWORD = "password";
-    private static final String COL_USER_TYPE = "user_type"; // Client or Coach
-    private static final String COL_INFO = "info"; // Objectives (Clients) or Skills (Coaches)
+    private static final String COL_USER_TYPE = "user_type"; // Client, Professional, or Mentor
+    private static final String COL_INFO = "info"; // Additional Info (e.g., objectives, skills)
 
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_USERS + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL_FIRST_NAME + " TEXT, " +
-                COL_LAST_NAME + " TEXT, " +
-                COL_EMAIL + " TEXT UNIQUE, " +
-                COL_PASSWORD + " TEXT, " +
-                COL_USER_TYPE + " TEXT, " +
+                COL_FIRST_NAME + " TEXT NOT NULL, " +
+                COL_LAST_NAME + " TEXT NOT NULL, " +
+                COL_EMAIL + " TEXT NOT NULL UNIQUE, " +
+                COL_PASSWORD + " TEXT NOT NULL, " +
+                COL_USER_TYPE + " TEXT NOT NULL, " +
                 COL_INFO + " TEXT)";
         db.execSQL(createTable);
     }
@@ -53,8 +57,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_USER_TYPE, userType);
         contentValues.put(COL_INFO, info);
 
-        long result = db.insert(TABLE_USERS, null, contentValues);
-        return result != -1; // Return true if insert was successful
+        try {
+            long result = db.insert(TABLE_USERS, null, contentValues);
+            return result != -1;
+        } catch (Exception e) {
+            Log.e(TAG, "Error inserting user: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Check if an email already exists
+    public boolean doesEmailExist(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE email = ?", new String[]{email});
+            return (cursor.getCount() > 0);
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking email existence: " + e.getMessage());
+            return false;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     // Fetch a user by email and password
@@ -66,15 +92,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
     }
 
-    // Fetch all coaches
-    public Cursor getAllCoaches() {
+    // Fetch a user by email only
+    public Cursor getUserByEmail(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE user_type = ?", new String[]{"Coach"});
+        return db.rawQuery(
+                "SELECT * FROM " + TABLE_USERS + " WHERE email = ?",
+                new String[]{email}
+        );
     }
 
-    // Fetch all recent graduates (for matching purposes)
-    public Cursor getAllRecentGraduates() {
+    // Fetch all coaches for matching purposes
+    public Cursor getAllCoaches() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE user_type = ?", new String[]{"Recent Graduate"});
+        return db.rawQuery(
+                "SELECT * FROM " + TABLE_USERS + " WHERE user_type = ?",
+                new String[]{"Coach/Mentor"}
+        );
     }
 }

@@ -19,7 +19,7 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.dashboard_activity);
 
         // Fetch user data (for demonstration, hardcoded user name)
-        String userName = "John Doe"; // Replace with actual user data
+        String userName = "Ayman Ayman"; // Replace with actual user data
 
         // Set the welcome message
         TextView welcomeText = findViewById(R.id.dashboard_welcome_text);

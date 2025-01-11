@@ -1,6 +1,7 @@
 package com.example.mowakkaba;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class SignUpActivity extends AppCompatActivity {
 
     private LinearLayout dynamicFormContainer;
+    private static final String TAG = "SignUpActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +122,7 @@ public class SignUpActivity extends AppCompatActivity {
                     additionalInfo = "Skills: " + skills + ", Certifications: " + certifications;
                 }
             } catch (Exception e) {
+                Log.e(TAG, "Error retrieving dynamic fields", e);
                 Toast.makeText(SignUpActivity.this, "Error in retrieving additional fields. Please try again.", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -130,6 +133,7 @@ public class SignUpActivity extends AppCompatActivity {
                 Toast.makeText(SignUpActivity.this, "Sign-Up Successful!", Toast.LENGTH_SHORT).show();
                 finish();
             } else {
+                Log.e(TAG, "Failed to insert user into the database");
                 Toast.makeText(SignUpActivity.this, "Sign-Up Failed. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });

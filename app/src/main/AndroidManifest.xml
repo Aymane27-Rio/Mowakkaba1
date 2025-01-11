@@ -38,6 +38,8 @@
         <activity android:name=".AppointmentsActivity" />
         <activity android:name=".ResourcesActivity" />
         <activity android:name=".MatchingActivity" />
+        <activity android:name=".EditProfileActivity" />
+
 
     </application>
 
