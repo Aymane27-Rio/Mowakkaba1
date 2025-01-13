@@ -1,8 +1,11 @@
 package com.example.mowakkaba;
-import android.annotation.SuppressLint;
+
+
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -13,41 +16,61 @@ import androidx.appcompat.app.AppCompatActivity;
 public class ProfileActivity extends AppCompatActivity {
 
     private DatabaseHelper dbHelper;
-    private String userEmail; // Passed from previous activity
+    private String userEmail;
+    private TextView nameTextView, emailTextView, userTypeTextView;
+    private LinearLayout detailsContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // Initialize UI Elements
-        TextView nameTextView = findViewById(R.id.profile_name);
-        TextView emailTextView = findViewById(R.id.profile_email);
-        TextView userTypeTextView = findViewById(R.id.profile_user_type);
-        LinearLayout detailsContainer = findViewById(R.id.profile_details_container);
-        Button editProfileButton = findViewById(R.id.edit_profile_button);
-        Button logoutButton = findViewById(R.id.logout_button);
-
-        // Initialize Database Helper
-        dbHelper = new DatabaseHelper(this);
-
         // Get user email from Intent
         userEmail = getIntent().getStringExtra("user_email");
+        Log.d("ProfileActivity", "Received user email: " + userEmail);
 
-        // Fetch user data from the database
-        Cursor cursor = dbHelper.getUserByEmail(userEmail); // Use getUserByEmail
+        if (userEmail == null || userEmail.isEmpty()) {
+            Toast.makeText(this, "No user email provided. Redirecting to Login.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+            finish();
+            return;
+        }
+
+        // Initialize UI elements
+        initializeUI();
+
+        // Load user data
+        loadUserData();
+    }
+
+    private void initializeUI() {
+        nameTextView = findViewById(R.id.profile_name);
+        emailTextView = findViewById(R.id.profile_email);
+        userTypeTextView = findViewById(R.id.profile_user_type);
+        detailsContainer = findViewById(R.id.profile_details_container);
+        Button logoutButton = findViewById(R.id.logout_button);
+
+        // Logout button action
+        logoutButton.setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+            finish();
+        });
+    }
+
+    private void loadUserData() {
+        dbHelper = new DatabaseHelper(this);
+        Cursor cursor = dbHelper.getUserByEmail(userEmail);
+
         if (cursor != null && cursor.moveToFirst()) {
-            // Populate profile details
-            @SuppressLint("Range") String fullName = cursor.getString(cursor.getColumnIndex("first_name")) + " " +
+            String fullName = cursor.getString(cursor.getColumnIndex("first_name")) + " " +
                     cursor.getString(cursor.getColumnIndex("last_name"));
-            @SuppressLint("Range") String userType = cursor.getString(cursor.getColumnIndex("user_type"));
-            @SuppressLint("Range") String additionalInfo = cursor.getString(cursor.getColumnIndex("info"));
+            String userType = cursor.getString(cursor.getColumnIndex("user_type"));
+            String additionalInfo = cursor.getString(cursor.getColumnIndex("info"));
 
             nameTextView.setText(fullName);
             emailTextView.setText(userEmail);
             userTypeTextView.setText(userType);
 
-            // Add dynamic details based on user type
             detailsContainer.removeAllViews();
             if (userType.equals("Recent Graduate")) {
                 addTextView(detailsContainer, "Objectives: " + additionalInfo);
@@ -60,28 +83,15 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
         } else {
-            Toast.makeText(this, "Error fetching user data", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No user data found.", Toast.LENGTH_SHORT).show();
+            finish();
         }
 
-        // Handle Edit Profile Button
-        editProfileButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-            intent.putExtra("user_email", userEmail);
-            startActivity(intent);
-        });
-
-        // Handle Logout Button
-        logoutButton.setOnClickListener(v -> {
-            // Navigate back to LoginActivity
-            Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        });
+        if (cursor != null) {
+            cursor.close();
+        }
     }
 
-    /**
-     * Dynamically adds a TextView to a container with the given text.
-     */
     private void addTextView(LinearLayout container, String text) {
         TextView textView = new TextView(this);
         textView.setText(text);
